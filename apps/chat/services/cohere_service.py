@@ -24,9 +24,9 @@ class CohereService(LLMService):
             "chat_history": list(map(self.change_message_model, messages[:-1])),
             "message": messages[-1]["content"],
         }
-        result = httpx.post(url, headers=headers, json=data)
+        result = httpx.post(url, headers=headers, json=data, timeout=60)
         if result.status_code == 200:
-            return result.text
+            return result.json()["text"]
         raise ServiceCallError()
 
     def change_message_model(self, message):

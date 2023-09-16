@@ -19,7 +19,7 @@ class OpenAIService(LLMService):
         url = self.url + "/chat/completions"
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
         data = {"model": self.model, "temperature": temperature, "messages": messages}
-        result = httpx.post(url, headers=headers, json=data)
+        result = httpx.post(url, headers=headers, json=data, timeout=60)
         if result.status_code == 200:
             return result.json()["choices"][0]["message"]["content"]
         raise ServiceCallError()
