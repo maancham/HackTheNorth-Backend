@@ -1,0 +1,70 @@
+[tool.poetry]
+name = "link_chaincloak_django"
+version = "0.1.0"
+description = ""
+authors = []
+
+[tool.poe.env]
+MODE = "dev"
+
+[tool.poe.tasks]
+_lint_flake = { shell = "flake8 ." }
+_lint_black = { shell = "python -m black --check ." }
+_pre_commit = { shell = "pre-commit install" }
+_dev = { shell = "python3 manage.py runserver" }
+dev = { sequence = ["_pre_commit", "_dev"] }
+_makemigrations = { shell = "python3 manage.py makemigrations && git add */migrations/*" }
+makemigrations = { sequence = ["compilemessages", "_makemigrations"] }
+idb = { shell = "python3 manage.py inspectdb | python3 override_check_fields.py > backend.py" }
+migrate = "python3 manage.py migrate"
+shell = "python3 manage.py shell"
+compilemessages = { shell = "python3 manage.py compilemessages -l fa" }
+makemessages = { shell = "python3 manage.py makemessages -l fa" }
+lint = { sequence = ["_lint_flake", "_lint_black"] }
+test = { shell = "bash run_tests.sh" }
+black = { shell = "black ." }
+
+
+[tool.poetry.dependencies]
+python = "^3.11"
+Django = "4.2.3"
+django-extensions = "3.2.0"
+django-debug-toolbar = "3.5.0"
+django-storages = "1.13.1"
+django-cors-headers = "3.14.0"
+django-multiselectfield = "0.1.12"
+djangorestframework = "3.14.0"
+django-simple-history = "3.3.0"
+django-filter = "22.1"
+sentry-sdk = "1.14.0"
+boto3 = "^1.24.49"
+ipython = "8.4.0"
+python-dotenv = "1.0.0"
+gunicorn = "20.1.0"
+python-decouple = "3.8"
+django-health-check = "3.16.5"
+drf-spectacular = "0.26.2"
+django-autoutils = "0.2.1"
+httpx = { extras = ["http2", "socks"], version = "^0.24.1" }
+path = "^16.4.0"
+pytest-django = "4.5.2"
+model-bakery = "1.11.0"
+django-object-actions = "^4.0.0"
+django-admin-inline-paginator = "^0.3.0"
+pycryptodome = "^3.16.0"
+psycopg2-binary = "^2.9.5"
+requests = { extras = ["socks"], version = "^2.31.0" }
+
+[tool.poetry.dev-dependencies]
+poethepoet = "0.20.0"
+flake8 = "6.0.0"
+black = "23.3.0"
+coverage = "7.2.5"
+pre-commit = "^3.3.1"
+
+[tool.black]
+line-length = 120
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
