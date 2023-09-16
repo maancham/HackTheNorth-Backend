@@ -1,3 +1,8 @@
+import re
+
+# Define the regular expression pattern
+pattern = r'\*\*\*(.*?)\*\*\*'
+
 from typing import List, Any
 
 import httpx
@@ -6,6 +11,9 @@ from decouple import config
 from apps.chat.exceptions import ServiceCallError
 from apps.chat.services.llm_service import LLMService
 
+
+def replace_matches(match):
+    return f'[{match.group(1)}]'
 
 class CohereService(LLMService):
     url = config("COHERE_URL", "")
@@ -22,7 +30,7 @@ class CohereService(LLMService):
     def chat(self, messages: List[Any], temperature=0.3) -> str:
         url = self.url + "/chat"
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
-        result_messages = [self.message_primary + message for message in messages[:-1]]
+        result_messages = [self.message_primary + re.sub(pattern, replace_matches, message) for message in messages[:-1]]
         result_messages = list(map(self.change_message_model, result_messages))
 
         data = {
