@@ -22,11 +22,14 @@ class CohereService(LLMService):
     def chat(self, messages: List[Any], temperature=0.3) -> str:
         url = self.url + "/chat"
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
+        result_messages = [self.message_primary + message for message in messages[:-1]]
+        result_messages = list(map(self.change_message_model, result_messages))
+
         data = {
             "prompt_truncation": "OFF",
             "temperature": temperature,
             "stream": False,
-            "chat_history": self.message_primary + list(map(self.change_message_model, messages[:-1])),
+            "chat_history": result_messages,
             "message": messages[-1]["content"],
         }
         result = httpx.post(url, headers=headers, json=data, timeout=60)

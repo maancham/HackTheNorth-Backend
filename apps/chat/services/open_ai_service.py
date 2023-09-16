@@ -24,7 +24,7 @@ class OpenAIService(LLMService):
         return self.model
 
     def chat(self, messages: List[Any], temperature=0.3) -> str:
-        message = message + [self.message_primary]
+        messages = messages + [self.message_primary]
         url = self.url + "/chat/completions"
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
         data = {"model": self.model, "temperature": temperature, "messages": messages}
