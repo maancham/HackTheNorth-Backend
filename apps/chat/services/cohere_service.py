@@ -18,8 +18,8 @@ def replace_matches(match):
 class CohereService(LLMService):
     url = config("COHERE_URL", "")
     api_key = config("COHERE_API_KEY", "")
-    def __init__(self) -> None:
-        self.message_primary = "Context: In this conversation, there are some parts that have been masked for user privacy, using *** notation. \
+    def init(self) -> None:
+        self.message_primary = "Context: In this conversation, there are some parts that have been masked for user privacy, denoted by ___, so whenever you see ___, it belongs to something that has been masked.\
             These masked parts can be names, places, or any sensitive information provided by users. Please continue the conversation as naturally \
                 as possible, and you can fill in the masked parts as needed. The main focus is on the flow and quality of the conversation. \
                     If you have any questions or need clarification, please feel free to ask. "
@@ -30,7 +30,11 @@ class CohereService(LLMService):
     def chat(self, messages: List[Any], temperature=0.3) -> str:
         url = self.url + "/chat"
         headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
-        result_messages = [self.message_primary + re.sub(pattern, replace_matches, message) for message in messages[:-1]]
+        print("messages old", messages)
+        messages[-1]["content"] = re.sub('<.*?>', '___', messages[-1]["content"])
+
+        result_messages = [self.message_primary + re.sub('<.*?>', '', message) for message in messages[:-1]]
+        print("messages new", messages)
         result_messages = list(map(self.change_message_model, result_messages))
 
         data = {
